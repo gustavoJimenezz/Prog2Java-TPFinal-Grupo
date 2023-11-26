@@ -3,67 +3,56 @@ package menues;
 import java.util.Scanner;
 import contenedores.ContenedorArticulos;
 import contenedores.ContenedorUsuarios;
+import exceptions.excepcionDeIngresoDeDatos;
 import models.Usuario;
 
-public class MenuLogin {
-	private Scanner sc;
+public class MenuLogin extends Menu {
 	private ContenedorUsuarios listaUsuarios;
 	private ContenedorArticulos listaArticulos;
 	private MenuEmpleado mEmpleado;
 	private MenuCliente mCliente;
 
-	public MenuLogin(Scanner sc, ContenedorUsuarios listaUsuarios) {
-		super();
-		this.sc = sc;
-		this.listaUsuarios = listaUsuarios;
-		listaArticulos = new ContenedorArticulos();
-		mEmpleado = new MenuEmpleado(sc, listaArticulos);
-		mCliente = new MenuCliente(sc, listaArticulos, listaUsuarios);
-		
+	public MenuLogin(Scanner sc, ContenedorUsuarios usuarios, ContenedorArticulos articulos) {
+		super(sc);
+		this.listaArticulos = articulos;
+		this.listaUsuarios = usuarios;
+		mEmpleado = new MenuEmpleado(super.getSc(), listaArticulos);
 	}
 
-	public Scanner getSc() {
-		return sc;
+	@Override
+	public String opciones() throws excepcionDeIngresoDeDatos {
+		System.out.println();
+		System.out.println(" ** Menu Login **");
+		System.out.println("1- Registrar Usuario");
+		System.out.println("2- Inicia sesion");
+		System.out.println("0- Salir del Programa");
+		System.out.println("Ingrese : ");
+		return super.getSc().next();
 	}
 
-	public void setSc(Scanner sc) {
-		this.sc = sc;
-	}
-
-	public void iniciar() {
-
-		boolean continuar = true;
-
-		while (continuar) {
-			System.out.println("1. Registrar Usuario");
-			System.out.println("2. Inicia sesi�n");
-			System.out.println("0. Salir del Programa");
-			int respuesta = sc.nextInt();
-
-			switch (respuesta) {
-			case 1:
-				registarUsuario();
-				break;
-			case 2:
-				iniciarSesionUsuario();
-				break;
-			case 0:
-				continuar = false;
-				break;
-
-			default:
-				System.out.println("Opci�n inv�lida.");
-				break;
-			}
+	@Override
+	public void procesarOpcion(String opcionElegida) throws excepcionDeIngresoDeDatos {
+		switch (opcionElegida) {
+		case "1":
+			registarUsuario();
+			break;
+		case "2":
+			iniciarSesionUsuario();
+			break;
+		case "0":
+			super.finalizar();
+			break;
+		default:
+			System.out.println("Opcion invalida.");
+			break;
 		}
-
 	}
 
 	private void iniciarSesionUsuario() {
 		System.out.println("Ingrese nombre de usuario: ");
-		String nombre = sc.next();
-		System.out.println("Ingrese contrase�a de usuario");
-		String contrasenia = sc.next();
+		String nombre = super.getSc().next();
+		System.out.println("Ingrese contrasenia de usuario");
+		String contrasenia = super.getSc().next();
 		for (Usuario usuario : listaUsuarios.getElementos()) {
 			if (nombre.equals(usuario.getNombreUsuario()) && contrasenia.equals(usuario.getContraseniaUsuario())) {
 				System.out.println("Usted es: ");
@@ -72,7 +61,8 @@ public class MenuLogin {
 					mEmpleado.iniciar();
 				}
 				if (usuario.getTipoUsuario() == 'C') {
-					mCliente.iniciar(usuario);
+					mCliente = new MenuCliente(super.getSc(), listaArticulos, listaUsuarios, usuario);
+					mCliente.iniciar();
 
 				}
 			} else {
@@ -90,7 +80,7 @@ public class MenuLogin {
 			System.out.println("1. Cliente");
 			System.out.println("2. Empleado");
 			System.out.println("0. Volver Atr�s");
-			int respuesta = sc.nextInt();
+			int respuesta = super.getSc().nextInt();
 
 			switch (respuesta) {
 			case 1:
@@ -115,17 +105,18 @@ public class MenuLogin {
 		boolean continuar = true;
 		char tipoUsuario = 'E';
 		System.out.println("Ingrese Nombre de Usuario:");
-		String nombre = sc.next();
+		String nombre = super.getSc().next();
 		while (continuar) {
 			System.out.println("Ingrese Clave Extra: ");
-			String claveExtra = sc.next();
+			String claveExtra = super.getSc().next();
 			if (claveExtra.equals("pepepiola123")) {
 				System.out.println("Ingrese Contrase�a: ");
-				String contrasenia = sc.next();
+				String contrasenia = super.getSc().next();
 				System.out.println("Ingrese nuevamente su Contrase�a");
-				String contraseniaConfirmar = sc.next();
+				String contraseniaConfirmar = super.getSc().next();
 				if (contrasenia.equals(contraseniaConfirmar)) {
-					listaUsuarios.agregar(new Usuario(nombre, contrasenia, tipoUsuario));;
+					listaUsuarios.agregar(new Usuario(nombre, contrasenia, tipoUsuario));
+					;
 					System.out.println("Usuario registrado con �xito.");
 					break;
 				} else {
@@ -143,12 +134,12 @@ public class MenuLogin {
 		boolean continuar = true;
 		char tipoUsuario = 'C';
 		System.out.println("Ingrese Nombre de Usuario:");
-		String nombre = sc.next();
+		String nombre = super.getSc().next();
 		while (continuar) {
 			System.out.println("Ingrese Contrase�a: ");
-			String contrasenia = sc.next();
+			String contrasenia = super.getSc().next();
 			System.out.println("Ingrese nuevamente su Contrase�a");
-			String contraseniaConfirmar = sc.next();
+			String contraseniaConfirmar = super.getSc().next();
 			if (contrasenia.equals(contraseniaConfirmar)) {
 				listaUsuarios.agregar(new Usuario(nombre, contrasenia, tipoUsuario));
 				System.out.println("Usuario registrado con �xito.");
