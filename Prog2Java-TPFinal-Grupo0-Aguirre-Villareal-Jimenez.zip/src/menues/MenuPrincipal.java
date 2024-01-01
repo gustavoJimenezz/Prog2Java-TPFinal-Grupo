@@ -77,7 +77,7 @@ public class MenuPrincipal extends Menu {
 				System.out.println("Bienvenido " + usr.getNombreUsuario());
 				this.iniciarSesion(usr);
 			} else {
-				System.out.println("Nombre y/o contrasenia incorrecta/s.");
+				System.out.println("No se encontro Usuario.");
 			}
 
 		} catch (Exception e) {

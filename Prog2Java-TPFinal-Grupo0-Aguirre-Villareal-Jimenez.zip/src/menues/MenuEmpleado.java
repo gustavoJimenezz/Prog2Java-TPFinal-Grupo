@@ -55,55 +55,38 @@ public class MenuEmpleado extends Menu {
 			break;
 		}
 	}
-	
+
 	private void cargarArticulo() throws ExcepcionDeIngresoDeDatos {
 		try {
-			Articulo nuevoArticulo = crearArticulo();
-			nuevoArticulo = this.aplicarCategoriaArticulo(nuevoArticulo);
+		
+	        int tipoArticulo = obtenerTipoArticulo();
+	        Articulo nuevoArticulo = crearArticulo(tipoArticulo);
 
 			if (nuevoArticulo != null) {
 				listaArticulos.agregar(nuevoArticulo);
 				System.out.println("Articulo Agregado con exito.");
 			} else {
-				System.out.println("No se agregar el Articulo");
+				System.out.println("No se agrego el Articulo.");
 			}
 
 		} catch (Exception e) {
-			throw new ExcepcionDeIngresoDeDatos("Error al registrar articulo ! ");
+			throw new ExcepcionDeIngresoDeDatos("Error al registrar articulo.");
 		}
 	}
-	
-	private Articulo aplicarCategoriaArticulo(Articulo art) {
-		Articulo artConCategoria = null;
-		if(art != null) {
-			System.out.println("Tipo de Aticulo");
-			System.out.println("1- Subsidiados");
-			System.out.println("2- Por demanda");
-			System.out.println("3- Simples");
-			System.out.print("Ingrese : ");
 
-			switch (super.getSc().next()) {
-			case "1":
-				artConCategoria = (ArticuloSubsidiado) art;
-				break;
-			case "2":
-				artConCategoria = (ArticuloPorDemanda) art;
-				System.out.print("Ingrese stock deaseado : ");
-				int stockDeaseado = super.getSc().nextInt();
-				((ArticuloPorDemanda) artConCategoria).setStockDeseado(stockDeaseado);
-				break;
-			case "3":
-				artConCategoria = art;
-				break;
-			default:
-				System.out.println("Opcion incorrecta !");
-				break;
-			}
-		}
-		return artConCategoria;
+	private int obtenerTipoArticulo() {
+
+		System.out.println("Tipo de Articulo");
+		System.out.println("1- Subsidiados");
+		System.out.println("2- Por demanda");
+		System.out.println("3- Simples");
+		System.out.print("Ingrese el tipo de artículo: ");
+
+		return super.getSc().nextInt();
 	}
 	
-	private Articulo crearArticulo() {
+	private Articulo crearArticulo(int tipoArticulo) {
+
 		System.out.println();
 		System.out.println(" * Cargar Articulo *");
 		System.out.print("Nombre: ");
@@ -113,12 +96,22 @@ public class MenuEmpleado extends Menu {
 		System.out.print("Stock : ");
 		int stockArticulo = super.getSc().nextInt();
 		char rubro = this.ingresarRubro();
-		
+
 		int id = listaArticulos.proximoId();
 
-		Articulo art = new Articulo(id, nombreArticulo, precioArticulo, stockArticulo, rubro);
-
-		return art;
+	    switch (tipoArticulo) {
+	        case 1:
+	            return new ArticuloSubsidiado(id, nombreArticulo, precioArticulo, stockArticulo, rubro);
+	        case 2:
+	            System.out.print("Ingrese el stock deseado para los artículos por demanda: ");
+	            int stockDeseado = super.getSc().nextInt();
+	            return new ArticuloPorDemanda(id, nombreArticulo, precioArticulo, stockArticulo, rubro, stockDeseado);
+	        case 3:
+	            return new Articulo(id, nombreArticulo, precioArticulo, stockArticulo, rubro);
+	        default:
+	            System.out.println("Opción incorrecta.");
+	            return null;
+	    }
 	}
 	
 	private char ingresarRubro() {
@@ -128,7 +121,7 @@ public class MenuEmpleado extends Menu {
 			System.out.println("A - Alimentos");
 			System.out.println("E - Electrodomesticos");
 			System.out.println("L - Limpieza");
-			System.out.println("Ingrese : ");
+			System.out.print("Ingrese : ");
 			rubro = super.getSc().next().charAt(0);
 			rubro = Character.toUpperCase(rubro);
 		} while (rubro != 'A' && rubro != 'E' && rubro != 'L');
@@ -142,10 +135,10 @@ public class MenuEmpleado extends Menu {
 			System.out.println("Ingrese el ID del Articulo para modificar: ");
 			int respuesta = super.getSc().nextInt();
 			Articulo articuloparaModificar = listaArticulos.buscarArticulo(respuesta);
-			if(articuloparaModificar != null ) {
+			if (articuloparaModificar != null) {
 				MenuEditarArticulo editar = new MenuEditarArticulo(super.getSc(), articuloparaModificar);
 				editar.iniciar();
-			}else {
+			} else {
 				System.out.println();
 				System.out.println("No se encontro el articulo a modificar");
 			}
@@ -154,7 +147,7 @@ public class MenuEmpleado extends Menu {
 			throw new ExcepcionDeIngresoDeDatos("Error! El id ingresado no coincide con ningun articulo.");
 		}
 	}
-	
+
 	private void eliminarArticulo() throws ExcepcionDeIngresoDeDatos {
 		try {
 			listaArticulos.mostrar();
@@ -170,6 +163,7 @@ public class MenuEmpleado extends Menu {
 	}
 
 	private void mostrarArticulos() {
+		System.out.println();
 		if (listaArticulos.estaVacio()) {
 			System.out.println("Sin articulo para mostrar.");
 		} else {
@@ -178,7 +172,6 @@ public class MenuEmpleado extends Menu {
 			}
 		}
 	}
-
 
 	private void verCantidadStockPorArticulo() {
 		for (Articulo articulo : listaArticulos.getElementos()) {
